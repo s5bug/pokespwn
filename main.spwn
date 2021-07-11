@@ -1,0 +1,22 @@
+extract obj_props
+
+// Make the level huge
+$.add(obj {
+    OBJ_ID: 211,
+    X: 300000,
+    Y: 1500,
+})
+
+gamescene = import gamescene
+
+screen = import "screen.spwn"
+
+game = (import "game.spwn")::new(gamescene, screen)
+
+loop = !{
+    game.step()
+    wait()
+    loop!
+}
+
+loop!

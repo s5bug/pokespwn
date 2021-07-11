@@ -1,0 +1,62 @@
+STATUS_OVERWORLD = 0
+
+type @game
+impl @game {
+    new: (gamescene, screen) {
+        status = @counter::new(STATUS_OVERWORLD)
+
+        primary = @counter::new(0)
+        secondary = @counter::new(0)
+
+        overworld_state = (import "overworld.spwn")::new(primary, secondary)
+
+        gamescene.button_a().on_triggered(!{
+            if primary < 1 {
+                primary += 1
+            }
+
+            if status == STATUS_OVERWORLD {
+                overworld_state.primary_triggered!
+            }
+        })
+        gamescene.button_a_end().on_triggered(!{
+            if primary > 0 {
+                primary -= 1
+            }
+        })
+
+        gamescene.button_b().on_triggered(!{
+            if secondary < 1 {
+                secondary += 1
+            }
+
+            if status == STATUS_OVERWORLD {
+                overworld_state.secondary_triggered!
+            }
+        })
+        gamescene.button_b_end().on_triggered(!{
+            if secondary > 0 {
+                secondary -= 1
+            }
+        })
+
+        -> return {
+            type: @game,
+            status: status,
+            gamescene: gamescene,
+            screen: screen,
+            primary: primary,
+            secondary: secondary,
+
+            overworld_state: overworld_state,
+        }
+    },
+
+    step: (self) {
+        if self.status == STATUS_OVERWORLD {
+            self.overworld_state.step(self)
+        }
+    }
+}
+
+return @game;

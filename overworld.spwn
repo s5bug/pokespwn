@@ -1,0 +1,25 @@
+type @overworld
+impl @overworld {
+    new: (primary: @counter, secondary: @counter) {
+        player_direction = @counter::new(0)
+
+        -> return {
+            type: @overworld,
+            player_direction: player_direction,
+            primary_triggered: !{},
+            secondary_triggered: !{
+                player_direction += 1
+
+                if player_direction > 3 {
+                    player_direction -= 4
+                }
+            },
+        }
+    },
+
+    step: (self, game) {
+
+    },
+}
+
+return @overworld;
