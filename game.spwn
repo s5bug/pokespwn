@@ -8,34 +8,34 @@ impl @game {
         primary = @counter::new(0)
         secondary = @counter::new(0)
 
-        overworld_state = (import "overworld.spwn")::new(primary, secondary)
+        overworld_state = (import "overworld.spwn")::new(screen, primary, secondary)
 
         gamescene.button_a().on_triggered(!{
-            if primary < 1 {
+            -> if primary < 1 {
                 primary += 1
             }
 
-            if status == STATUS_OVERWORLD {
+            -> if status == STATUS_OVERWORLD {
                 overworld_state.primary_triggered!
             }
         })
         gamescene.button_a_end().on_triggered(!{
-            if primary > 0 {
+            -> if primary > 0 {
                 primary -= 1
             }
         })
 
         gamescene.button_b().on_triggered(!{
-            if secondary < 1 {
+            -> if secondary < 1 {
                 secondary += 1
             }
 
-            if status == STATUS_OVERWORLD {
+            -> if status == STATUS_OVERWORLD {
                 overworld_state.secondary_triggered!
             }
         })
         gamescene.button_b_end().on_triggered(!{
-            if secondary > 0 {
+            -> if secondary > 0 {
                 secondary -= 1
             }
         })

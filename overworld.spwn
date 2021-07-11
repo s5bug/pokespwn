@@ -1,18 +1,51 @@
+type @overworld_player
+impl @overworld_player {
+    new: (screen) {
+        direction = @counter::new(0)
+        map_x = @counter::new(0)
+        map_y = @counter::new(0)
+
+        arrow_group = ?g
+        arrow = obj {
+            obj_props.OBJ_ID: 914,
+            obj_props.TEXT: "->",
+            obj_props.X: 150 + (10 * 15),
+            obj_props.Y: 22.5 + (9 * 15),
+            obj_props.GROUPS: [screen.screen_group, arrow_group],
+        }
+        $.add(arrow)
+
+        -> return {
+            type: @overworld_player,
+            direction: direction,
+            map_x: map_x,
+            map_y: map_y,
+            arrow_group: arrow_group,
+            arrow: arrow,
+        }
+    },
+
+    rotate: (self) {
+        self.arrow_group.rotate(self.arrow_group, 90)
+        self.direction += 1
+
+        if self.direction >= 4 {
+            self.direction -= 4
+        }
+    },
+}
+
 type @overworld
 impl @overworld {
-    new: (primary: @counter, secondary: @counter) {
-        player_direction = @counter::new(0)
+    new: (screen, primary: @counter, secondary: @counter) {
+        player = @overworld_player::new(screen)
 
         -> return {
             type: @overworld,
-            player_direction: player_direction,
+            player: player,
             primary_triggered: !{},
             secondary_triggered: !{
-                player_direction += 1
-
-                if player_direction > 3 {
-                    player_direction -= 4
-                }
+                player.rotate()
             },
         }
     },
