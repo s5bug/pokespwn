@@ -9,9 +9,7 @@ $.add(obj {
 
 gamescene = import gamescene
 
-screen = import "screen.spwn"
-
-game = (import "game.spwn")::new(gamescene, screen)
+game = (import "game.spwn")::new(gamescene)
 
 loop = !{
     game.step()

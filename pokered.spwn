@@ -1,0 +1,101 @@
+import "template.spwn"
+
+type @blockset
+impl @blockset {
+    new: (path) {
+        $.print("Path: " + path)
+        bsdata = $.readfile(path)
+        num_blocks = bsdata.length / 16
+
+        let block_datas = []
+        for i in 0..num_blocks {
+            block_datas.push(bsdata.substr(i * 16, (i + 1) * 16))
+        }
+
+        -> return {
+            type: @blockset,
+            block_datas: block_datas,
+        }
+    }
+}
+
+type @map
+impl @map {
+    new: (path, blockset, width, height) {
+        mapdata = $.readfile(path)
+
+        let tiles = []
+        for by in 0..height {
+            for i in 0..4 { tiles.push([]) }
+            for bx in 0..width {
+                block = mapdata[bx + (by * width)]
+
+                blockdata = blockset[block]
+
+                for tx in 0..4 {
+                    for ty in 0..4 {
+                        tile = blockdata[tx + (ty * 4)]
+                        tiles[(by * 4) + ty].push(tile)
+                    }
+                }
+            }
+        }
+
+        -> return {
+            type: @map,
+            tiles: tiles,
+        }
+    }
+}
+
+tilesets = {
+    reds_house: [
+        @template::new(), // wall
+        (){
+            let floor = @template::new()
+            let floor_col_prim = ?c
+            floor_col_prim.set(173, 173, 173)
+            let floor_col_sec = ?c
+            floor_col_sec.set(222, 255, 222)
+            floor.add(1881, 0, 0, 1.0, [floor_col_prim, floor_col_sec])
+            -> return floor
+        }(), // floor
+        @template::new(), // top left chair
+        @template::new(), // top right chair
+        @template::new(), // top carpet
+        @template::new(), // left box
+        @template::new(), // top left tv
+        @template::new(), // top right tv
+        @template::new(), // top left plant
+        @template::new(), // top right plant
+        @template::new(), // top left downstairs
+        @template::new(), // top right downstairs
+        @template::new(), // top left upstairs
+        @template::new(), // top right upstairs
+        @template::new(), // top left sfc
+        @template::new(), // top right sfc
+        (){
+            let border = @template::new()
+            let border_col = ?c
+            border_col.set(0, 0, 0)
+            border.add(211, 0, 0, 1.0, [border_col])
+            -> return border
+        }(), // border tile
+    ]
+}
+
+maps = [
+    {
+        map_name: "RedsHouse2F",
+        tileset: "reds_house",
+        tile_data: "RedsHouse2",
+        width: 4,
+        height: 4,
+    },
+]
+
+for map in maps {
+    blockset = @blockset::new("pokered/gfx/blocksets/" + map.tileset + ".bst")
+    mapdata = @map::new("pokered/maps/" + map.map_name + ".blk", blockset, map.width, map.height)
+    mapdata.render(tilesets[map.tileset], ?g)
+}

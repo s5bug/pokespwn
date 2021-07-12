@@ -2,13 +2,13 @@ STATUS_OVERWORLD = 0
 
 type @game
 impl @game {
-    new: (gamescene, screen) {
+    new: (gamescene) {
         status = @counter::new(STATUS_OVERWORLD)
 
         primary = @counter::new(0)
         secondary = @counter::new(0)
 
-        overworld_state = (import "overworld.spwn")::new(screen, primary, secondary)
+        overworld_state = (import "overworld.spwn")::new(primary, secondary)
 
         gamescene.button_a().on_triggered(!{
             -> if primary < 1 {
@@ -44,7 +44,6 @@ impl @game {
             type: @game,
             status: status,
             gamescene: gamescene,
-            screen: screen,
             primary: primary,
             secondary: secondary,
 

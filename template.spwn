@@ -1,0 +1,44 @@
+type @template
+impl @template {
+    new: () {
+        -> return {
+            type: @template,
+            objs: [],
+        }
+    },
+
+    add: (self, obj_id: @number, x: @number, y: @number, scale: @number, colors) {
+        self.objs.push({
+            obj_id: obj_id,
+            x: x,
+            y: y,
+            scale: scale,
+            colors: colors,
+        })
+    },
+
+    scale: (self, by: @number) {
+        for objc in self.objs {
+            objc.scale *= by
+        }
+    },
+
+    render: (self, x: @number, y: @number, group: @group) {
+        for objc in self.objs {
+            let objo = obj {
+                obj_props.OBJ_ID: objc.obj_id,
+                obj_props.X: objc.x + x,
+                obj_props.Y: objc.y + y,
+                obj_props.SCALING: objc.scale,
+                obj_props.COLOR: objc.colors[0],
+                obj_props.GROUPS: [group],
+            }
+
+            if objc.colors.length > 1 {
+                objo.set(obj_props.COLOR_2, objc.colors[1])
+            }
+
+            $.add(objo)
+        }
+    }
+}
