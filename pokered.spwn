@@ -3,13 +3,16 @@ import "template.spwn"
 type @blockset
 impl @blockset {
     new: (path) {
-        $.print("Path: " + path)
-        bsdata = $.readfile(path)
+        bsdata = $.readfile(path, "bin")
         num_blocks = bsdata.length / 16
 
         let block_datas = []
         for i in 0..num_blocks {
-            block_datas.push(bsdata.substr(i * 16, (i + 1) * 16))
+            let block = []
+            for i in (i * 16)..((i + 1) * 16) {
+                block.push(bsdata[i])
+            }
+            block_datas.push(block)
         }
 
         -> return {
@@ -22,35 +25,205 @@ impl @blockset {
 type @map
 impl @map {
     new: (path, blockset, width, height) {
-        mapdata = $.readfile(path)
+        mapdata = $.readfile(path, "bin")
 
         let tiles = []
         for by in 0..height {
-            for i in 0..4 { tiles.push([]) }
+            // Arrays of arrays don't store mutability
+            let firstRow = []
+            let secondRow = []
+            let thirdRow = []
+            let fourthRow = []
+
             for bx in 0..width {
                 block = mapdata[bx + (by * width)]
 
-                blockdata = blockset[block]
+                blockdata = blockset.block_datas[block]
 
                 for tx in 0..4 {
-                    for ty in 0..4 {
-                        tile = blockdata[tx + (ty * 4)]
-                        tiles[(by * 4) + ty].push(tile)
-                    }
+                    firstRow.push(blockdata[tx])
+                    secondRow.push(blockdata[tx + 4])
+                    thirdRow.push(blockdata[tx + 8])
+                    fourthRow.push(blockdata[tx + 12])
                 }
             }
+
+            tiles.push(firstRow)
+            tiles.push(secondRow)
+            tiles.push(thirdRow)
+            tiles.push(fourthRow)
         }
 
         -> return {
             type: @map,
             tiles: tiles,
+            width: width,
+            height: height,
+        }
+    },
+
+    render: (self, tileset, group, blx, bly) {
+        maxHeight = 30 * (self.height * 4)
+        for y in 0..(self.height * 4) {
+            for x in 0..(self.width * 4) {
+                tileRow = self.tiles[y]
+                tile = tileRow[x]
+                tileset[tile].render(blx + (x * 30), bly + (maxHeight - (y * 30)), group)
+            }
         }
     }
 }
 
 tilesets = {
+    overworld: [
+        // 0x00 - 0x0F
+        @template::new(), // blank
+        @template::new(), // top cliff
+        @template::new(), // top right cliff
+        (){
+            let grass_with_flower = @template::new()
+
+            let grass_col_prim = ?c
+            grass_col_prim.set(99, 206, 8)
+            let grass_col_sec = ?c
+            grass_col_sec.set(181, 255, 82)
+            grass_with_flower.add(1869, -7.5, 7.5, 0.5, [grass_col_prim, grass_col_sec])
+            grass_with_flower.add(1870, 7.5, 7.5, 0.5, [grass_col_prim, grass_col_sec])
+            grass_with_flower.add(1871, -7.5, -7.5, 0.5, [grass_col_prim, grass_col_sec])
+            grass_with_flower.add(1872, 7.5, -7.5, 0.5, [grass_col_prim, grass_col_sec])
+
+            let flower_col_prim = ?c
+            flower_col_prim.set(247, 82, 49)
+            let flower_col_sec = ?c
+            flower_col_sec.set(255, 156, 198)
+            grass_with_flower.add(939, 0, 0, 1.0, [flower_col_prim, flower_col_sec])
+
+            -> return grass_with_flower
+        }(), // flower
+        @template::new(), // plank
+        @template::new(), // left top left roof
+        @template::new(), // right top left roof
+        @template::new(), // top roof
+        @template::new(), // left top right roof
+        @template::new(), // right top right roof
+        @template::new(), // window
+        @template::new(), // top left door
+        @template::new(), // top right door
+        @template::new(), // plain
+        @template::new(), // top small post
+        @template::new(), // right road
+        // 0x10 - 0x1F
+        @template::new(), // vertical rail
+        @template::new(), // cliff
+        @template::new(), // rooftop
+        @template::new(), // bottom left cliff (?)
+        @template::new(), // water
+        @template::new(), // left left roof
+        @template::new(), // right left roof
+        @template::new(), // bottom roof
+        @template::new(), // left right roof
+        @template::new(), // right right roof
+        @template::new(), // bottom house
+        @template::new(), // bottom left door
+        @template::new(), // bottom right door
+        @template::new(), // grass
+        @template::new(), // top left cliff
+        @template::new(), // left road
+        // 0x20 - 0x2F
+        @template::new(), // horizontal rail
+        @template::new(), // rail joint
+        @template::new(), // house
+        (){
+            let blank = @template::new()
+            let blank_col = ?c
+            blank_col.set(222, 255, 222)
+            blank.add(211, 0, 0, 1.0, [blank_col])
+            -> return blank
+        }(), // blank
+        @template::new(), // top left cliff (?)
+        @template::new(), // left bottom left roof
+        @template::new(), // right bottom left roof
+        @template::new(), // right cliff (?)
+        @template::new(), // left bottom right roof
+        @template::new(), // right bottom right roof
+        @template::new(), // top left post
+        @template::new(), // top right post
+        (){
+            let grass = @template::new()
+            let grass_col_prim = ?c
+            grass_col_prim.set(99, 206, 8)
+            let grass_col_sec = ?c
+            grass_col_sec.set(181, 255, 82)
+            grass.add(1869, -7.5, 7.5, 0.5, [grass_col_prim, grass_col_sec])
+            grass.add(1870, 7.5, 7.5, 0.5, [grass_col_prim, grass_col_sec])
+            grass.add(1871, -7.5, -7.5, 0.5, [grass_col_prim, grass_col_sec])
+            grass.add(1872, 7.5, -7.5, 0.5, [grass_col_prim, grass_col_sec])
+            -> return grass
+        }(), // grass
+        @template::new(), // top left cuttable tree
+        @template::new(), // top right cuttable tree
+        @template::new(), // left GYM sign
+        // 0x30 - 0x3F
+        @template::new(), // muddy soil (?)
+        @template::new(), // fence(?)
+        @template::new(), // cliff(?)
+        @template::new(), // cliff(?)
+        @template::new(), // bottom right cliff (?)
+        @template::new(), // cliff(?)
+        @template::new(), // cliff(?)
+        @template::new(), // cliff(?)
+        @template::new(), // roof side
+        @template::new(), // plain
+        @template::new(), // bottom left post
+        @template::new(), // bottom right post
+        @template::new(), // plank
+        @template::new(), // bottom left cuttable tree
+        @template::new(), // bottom right cuttable tree
+        @template::new(), // right GYM sign
+        // 0x40 - 0x4F
+        @template::new(), // top left tree
+        @template::new(), // top right tree
+        @template::new(), // PO
+        @template::new(), // Ké
+        @template::new(), // MA
+        @template::new(), // RT
+        @template::new(), // top left sign
+        @template::new(), // top right sign
+        @template::new(), // top left cave entrance
+        @template::new(), // top right cave entrance
+        @template::new(), // fence(?)
+        @template::new(), // brick
+        @template::new(), // top left barrier
+        @template::new(), // top right barrier
+        @template::new(), // bottom left (???)
+        @template::new(), // bottom right (???)
+        // 0x50 - 0x5F
+        @template::new(), // bottom left tree
+        @template::new(), // bottom right tree
+        @template::new(), // sprout
+        @template::new(), // top rooftop
+        @template::new(), // cliff(?)
+        @template::new(), // bottom small post
+        @template::new(), // bottom left sign
+        @template::new(), // bottom right sign
+        @template::new(), // bottom left cave entrance
+        @template::new(), // bottom right cave entrance
+        @template::new(), // (???)
+        @template::new(), // stones(?)
+        @template::new(), // bottom left barrier
+        @template::new(), // bottom right barrier
+    ],
     reds_house: [
-        @template::new(), // wall
+        // 0x00 - 0x0F
+        (){
+            let wall = @template::new()
+            let wall_color_prim = ?c
+            wall_color_prim.set(148, 156, 255)
+            let wall_color_sec = ?c
+            wall_color_sec.set(107, 99, 255)
+            wall.add(1873, 0, 0, 1.0, [wall_color_prim, wall_color_sec])
+            -> return wall
+        }(), // wall
         (){
             let floor = @template::new()
             let floor_col_prim = ?c
@@ -74,6 +247,7 @@ tilesets = {
         @template::new(), // top right upstairs
         @template::new(), // top left sfc
         @template::new(), // top right sfc
+        // 0x10 - 0x1F
         (){
             let border = @template::new()
             let border_col = ?c
@@ -81,10 +255,82 @@ tilesets = {
             border.add(211, 0, 0, 1.0, [border_col])
             -> return border
         }(), // border tile
+        @template::new(), // blank
+        @template::new(), // bottom left chair
+        @template::new(), // bottom right chair
+        @template::new(), // bottom carpet
+        @template::new(), // right box
+        @template::new(), // bottom left tv
+        @template::new(), // bottom right tv
+        @template::new(), // bottom left pot
+        @template::new(), // bottom right pot
+        @template::new(), // bottom left downstairs
+        @template::new(), // bottom right downstairs
+        @template::new(), // bottom left upstairs
+        @template::new(), // bottom right upstairs
+        @template::new(), // bottom left sfc
+        @template::new(), // bottom right sfc
+        // 0x20 - 0x2F
+        @template::new(), // bottom left pc
+        @template::new(), // bottom right pc
+        @template::new(), // top left bottom shelf
+        @template::new(), // top right bottom shelf
+        @template::new(), // top left poster
+        @template::new(), // top right poster
+        @template::new(), // top left table
+        @template::new(), // top left center table
+        @template::new(), // top right center table
+        @template::new(), // top right table
+        @template::new(), // bottom center table
+        @template::new(), // bottom right table
+        @template::new(), // bottom left table
+        @template::new(), // top left bedframe
+        @template::new(), // top right bedframe
+        @template::new(), // bottom right bedframe
+        // 0x30 - 0x3F
+        @template::new(), // top left bookshelf
+        @template::new(), // top right bookshelf
+        @template::new(), // bottom left bookshelf
+        @template::new(), // bottom right bookshelf
+        @template::new(), // bottom left poster
+        @template::new(), // bottom right poster
+        @template::new(), // left table
+        @template::new(), // left center table
+        @template::new(), // right center table
+        @template::new(), // right table
+        @template::new(), // bottom table legs
+        @template::new(), // bottom right table legs
+        @template::new(), // bottom left table legs
+        @template::new(), // left bed
+        @template::new(), // right bed
+        @template::new(), // bottom left bedframe
+        // 0x40 - 0x4F
+        @template::new(), // top left pc
+        @template::new(), // top right pc
+        @template::new(), // left keyboard
+        @template::new(), // right keyboard
+        @template::new(), // top left plant
+        @template::new(), // top right plant
+        @template::new(), // top left pot
+        @template::new(), // top right pot
     ]
 }
 
 maps = [
+    {
+        map_name: "PalletTown",
+        tileset: "overworld",
+        tile_data: "PalletTown", // TODO check this
+        width: 10,
+        height: 9,
+    },
+    {
+        map_name: "RedsHouse1F",
+        tileset: "reds_house",
+        tile_data: "RedsHouse1",
+        width: 4,
+        height: 4,
+    },
     {
         map_name: "RedsHouse2F",
         tileset: "reds_house",
@@ -94,8 +340,11 @@ maps = [
     },
 ]
 
+let blx = 300
 for map in maps {
     blockset = @blockset::new("pokered/gfx/blocksets/" + map.tileset + ".bst")
     mapdata = @map::new("pokered/maps/" + map.map_name + ".blk", blockset, map.width, map.height)
-    mapdata.render(tilesets[map.tileset], ?g)
+    mapdata.render(tilesets[map.tileset], ?g, blx, 0)
+
+    blx = blx + ((map.width + 1) * 120)
 }
