@@ -87,16 +87,16 @@ tilesets = {
             grass_col_prim.set(99, 206, 8)
             let grass_col_sec = ?c
             grass_col_sec.set(181, 255, 82)
-            grass_with_flower.add(1869, -7.5, 7.5, 0.5, [grass_col_prim, grass_col_sec])
-            grass_with_flower.add(1870, 7.5, 7.5, 0.5, [grass_col_prim, grass_col_sec])
-            grass_with_flower.add(1871, -7.5, -7.5, 0.5, [grass_col_prim, grass_col_sec])
-            grass_with_flower.add(1872, 7.5, -7.5, 0.5, [grass_col_prim, grass_col_sec])
+            grass_with_flower.add(1869, -7.5, 7.5, [grass_col_prim, grass_col_sec], 0.5)
+            grass_with_flower.add(1870, 7.5, 7.5, [grass_col_prim, grass_col_sec], 0.5)
+            grass_with_flower.add(1871, -7.5, -7.5, [grass_col_prim, grass_col_sec], 0.5)
+            grass_with_flower.add(1872, 7.5, -7.5, [grass_col_prim, grass_col_sec], 0.5)
 
             let flower_col_prim = ?c
             flower_col_prim.set(247, 82, 49)
             let flower_col_sec = ?c
             flower_col_sec.set(255, 156, 198)
-            grass_with_flower.add(939, 0, 0, 1.0, [flower_col_prim, flower_col_sec])
+            grass_with_flower.add(939, 0, 0, [flower_col_prim, flower_col_sec])
 
             -> return grass_with_flower
         }(), // flower
@@ -106,7 +106,23 @@ tilesets = {
         @template::new(), // top roof
         @template::new(), // left top right roof
         @template::new(), // right top right roof
-        @template::new(), // window
+        (){
+            let window = @template::new()
+
+            let wall_col = ?c
+            wall_col.set(255, 132, 8)
+            window.add(211, 0, 0, [wall_col])
+
+            let inside_col = ?c
+            inside_col.set(255, 255, 57)
+            window.add(211, 0, 0, [inside_col], 0.9)
+
+            let window_col = ?c
+            window_col.set(222, 255, 222)
+            window.add(1120, 0, 0, [window_col], 1.35)
+
+            -> return window
+        }(), // window
         @template::new(), // top left door
         @template::new(), // top right door
         @template::new(), // plain
@@ -115,9 +131,29 @@ tilesets = {
         // 0x10 - 0x1F
         @template::new(), // vertical rail
         @template::new(), // cliff
-        @template::new(), // rooftop
+        (){
+            let rooftop = @template::new()
+
+            let backing_col = ?c
+            backing_col.set(255, 255, 255)
+            rooftop.add(211, 0, 0, [backing_col])
+
+            let rooftop_col = ?c
+            rooftop_col.set(41, 140, 255)
+            rooftop.add(282, 0, 0, [rooftop_col])
+
+            -> return rooftop
+        }(), // rooftop
         @template::new(), // bottom left cliff (?)
-        @template::new(), // water
+        (){
+            let water = @template::new()
+            let water_col_prim = ?c
+            water_col_prim.set(107, 99, 255)
+            let water_col_sec = ?c
+            water_col_sec.set(222, 255, 222)
+            water.add(1516, 0, 0, [water_col_prim, water_col_sec])
+            -> return water
+        }(), // water
         @template::new(), // left left roof
         @template::new(), // right left roof
         @template::new(), // bottom roof
@@ -126,7 +162,18 @@ tilesets = {
         @template::new(), // bottom house
         @template::new(), // bottom left door
         @template::new(), // bottom right door
-        @template::new(), // grass
+        (){
+            let grass = @template::new()
+            let grass_col_prim = ?c
+            grass_col_prim.set(99, 206, 8)
+            let grass_col_sec = ?c
+            grass_col_sec.set(181, 255, 82)
+            grass.add(1869, -7.5, 7.5, [grass_col_prim, grass_col_sec], 0.5)
+            grass.add(1870, 7.5, 7.5, [grass_col_prim, grass_col_sec], 0.5)
+            grass.add(1871, -7.5, -7.5, [grass_col_prim, grass_col_sec], 0.5)
+            grass.add(1872, 7.5, -7.5, [grass_col_prim, grass_col_sec], 0.5)
+            -> return grass
+        }(), // grass
         @template::new(), // top left cliff
         @template::new(), // left road
         // 0x20 - 0x2F
@@ -137,7 +184,7 @@ tilesets = {
             let blank = @template::new()
             let blank_col = ?c
             blank_col.set(222, 255, 222)
-            blank.add(211, 0, 0, 1.0, [blank_col])
+            blank.add(211, 0, 0, [blank_col])
             -> return blank
         }(), // blank
         @template::new(), // top left cliff (?)
@@ -154,17 +201,34 @@ tilesets = {
             grass_col_prim.set(99, 206, 8)
             let grass_col_sec = ?c
             grass_col_sec.set(181, 255, 82)
-            grass.add(1869, -7.5, 7.5, 0.5, [grass_col_prim, grass_col_sec])
-            grass.add(1870, 7.5, 7.5, 0.5, [grass_col_prim, grass_col_sec])
-            grass.add(1871, -7.5, -7.5, 0.5, [grass_col_prim, grass_col_sec])
-            grass.add(1872, 7.5, -7.5, 0.5, [grass_col_prim, grass_col_sec])
+            grass.add(1869, -7.5, 7.5, [grass_col_prim, grass_col_sec], 0.5)
+            grass.add(1870, 7.5, 7.5, [grass_col_prim, grass_col_sec], 0.5)
+            grass.add(1871, -7.5, -7.5, [grass_col_prim, grass_col_sec], 0.5)
+            grass.add(1872, 7.5, -7.5, [grass_col_prim, grass_col_sec], 0.5)
             -> return grass
         }(), // grass
         @template::new(), // top left cuttable tree
         @template::new(), // top right cuttable tree
         @template::new(), // left GYM sign
         // 0x30 - 0x3F
-        @template::new(), // muddy soil (?)
+        (){
+            let soil = @template::new()
+
+            let soil_col_prim = ?c
+            soil_col_prim.set(165, 123, 24)
+            let soil_col_sec = ?c
+            soil_col_sec.set(198, 148, 57)
+            soil.add(1862, 0, 0, [soil_col_prim, soil_col_sec])
+
+            let border_col = ?c
+            border_col.set(222, 255, 222)
+            soil.add(503, 0, -5, [border_col], 1.0, 0.0)
+            soil.add(503, -5, 0, [border_col], 1.0, 90.0)
+            soil.add(503, 0, 5, [border_col], 1.0, 180.0)
+            soil.add(503, 5, 0, [border_col], 1.0, 270.0)
+
+            -> return soil
+        }(), // muddy soil (?)
         @template::new(), // fence(?)
         @template::new(), // cliff(?)
         @template::new(), // cliff(?)
@@ -173,7 +237,22 @@ tilesets = {
         @template::new(), // cliff(?)
         @template::new(), // cliff(?)
         @template::new(), // roof side
-        @template::new(), // plain
+        (){
+            let plain = @template::new()
+
+            let plain_col_prim = ?c
+            plain_col_prim.set(173, 173, 173)
+            let plain_col_sec = ?c
+            plain_col_sec.set(222, 255, 222)
+            plain.add(1884, 0, 0, [plain_col_prim, plain_col_sec])
+
+            plain.add(503, 0, -5, [plain_col_sec], 1.0, 0.0)
+            plain.add(503, -5, 0, [plain_col_sec], 1.0, 90.0)
+            plain.add(503, 0, 5, [plain_col_sec], 1.0, 180.0)
+            plain.add(503, 5, 0, [plain_col_sec], 1.0, 270.0)
+
+            -> return plain
+        }(), // plain
         @template::new(), // bottom left post
         @template::new(), // bottom right post
         @template::new(), // plank
@@ -209,7 +288,16 @@ tilesets = {
         @template::new(), // bottom left cave entrance
         @template::new(), // bottom right cave entrance
         @template::new(), // (???)
-        @template::new(), // stones(?)
+        (){
+            let stones = @template::new()
+            let stone_col = ?c
+            stone_col.set(222, 255, 222)
+            let grout_col = ?c
+            grout_col.set(198, 148, 57)
+            stones.add(1444, 0, 0, [grout_col, grout_col])
+            stones.add(1433, 0, 0, [stone_col, stone_col])
+            -> return stones
+        }(), // stones(?)
         @template::new(), // bottom left barrier
         @template::new(), // bottom right barrier
     ],
@@ -221,7 +309,7 @@ tilesets = {
             wall_color_prim.set(148, 156, 255)
             let wall_color_sec = ?c
             wall_color_sec.set(107, 99, 255)
-            wall.add(1873, 0, 0, 1.0, [wall_color_prim, wall_color_sec])
+            wall.add(1873, 0, 0, [wall_color_prim, wall_color_sec])
             -> return wall
         }(), // wall
         (){
@@ -230,7 +318,7 @@ tilesets = {
             floor_col_prim.set(173, 173, 173)
             let floor_col_sec = ?c
             floor_col_sec.set(222, 255, 222)
-            floor.add(1881, 0, 0, 1.0, [floor_col_prim, floor_col_sec])
+            floor.add(1881, 0, 0, [floor_col_prim, floor_col_sec])
             -> return floor
         }(), // floor
         @template::new(), // top left chair
@@ -252,7 +340,7 @@ tilesets = {
             let border = @template::new()
             let border_col = ?c
             border_col.set(0, 0, 0)
-            border.add(211, 0, 0, 1.0, [border_col])
+            border.add(211, 0, 0, [border_col])
             -> return border
         }(), // border tile
         @template::new(), // blank
@@ -318,6 +406,20 @@ tilesets = {
 
 maps = [
     {
+        map_name: "CeladonCity",
+        tileset: "overworld",
+        tile_data: "CeladonCity", // TODO check this
+        width: 25,
+        height: 18,
+    },
+    {
+        map_name: "CinnabarIsland",
+        tileset: "overworld",
+        tile_data: "CinnabarIsland",
+        width: 10,
+        height: 9,
+    },
+    {
         map_name: "PalletTown",
         tileset: "overworld",
         tile_data: "PalletTown", // TODO check this
@@ -338,6 +440,20 @@ maps = [
         width: 4,
         height: 4,
     },
+    {
+        map_name: "Route1",
+        tileset: "overworld",
+        tile_data: "Route1", // TODO check this
+        width: 10,
+        height: 18,
+    },
+    {
+        map_name: "ViridianCity",
+        tileset: "overworld",
+        tile_data: "ViridianCity", // TODO check this
+        width: 20,
+        height: 18,
+    }
 ]
 
 let blx = 300

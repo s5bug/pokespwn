@@ -7,12 +7,13 @@ impl @template {
         }
     },
 
-    add: (self, obj_id: @number, x: @number, y: @number, scale: @number, colors) {
+    add: (self, obj_id: @number, x: @number, y: @number, colors, scale = 1.0, rotation = 0.0) {
         self.objs.push({
             obj_id: obj_id,
             x: x,
             y: y,
             scale: scale,
+            rotation: rotation,
             colors: colors,
         })
     },
@@ -30,6 +31,7 @@ impl @template {
                 obj_props.X: objc.x + x,
                 obj_props.Y: objc.y + y,
                 obj_props.SCALING: objc.scale,
+                obj_props.ROTATION: objc.rotation,
                 obj_props.COLOR: objc.colors[0],
                 obj_props.GROUPS: [group],
             }
